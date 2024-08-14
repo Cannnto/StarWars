@@ -1,0 +1,11 @@
+@font-face {
+    font-family: myFont;
+    src: url(starjedi/Starjedi.ttf);
+}
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: 0;
+    overflow: hidden;
+    font-family: myFont;
+}

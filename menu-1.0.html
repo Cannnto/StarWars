@@ -1,0 +1,249 @@
+<html>
+	<link rel="stylesheet" href="style.css">
+	<title>game</title>
+<body>
+</body>
+<script>
+var FPS = 20;
+let devOptions = {enemyCount:5,obstacleCount:5}
+
+</script>
+<script src="Rectangle-1.1.js"></script>
+<script src="Star-1.0.js"></script>
+<script src="Stars-1.0.js"></script>
+<script src="Obstacle-1.5.js"></script>
+<script src="Obstacles-1.2.js"></script>
+<script src="Power-1.5.js"></script>
+<script src="Powers-1.2.js"></script>
+<script src="Sprites-1.0.js"></script>
+<script src="Laser-1.3.js"></script>
+<script src="Lasers-1.3.js"></script>
+<script src="blaster.js"></script>
+<script src="Actor-1.8.js"></script>
+<script src="HUD-1.2.js"></script>
+<script src="EnemyShoot.js"></script>
+<script src="Enemy-1.2.js"></script>
+<script src="Enemies-1.1.js"></script>
+<script src="Sound-1.0.js"></script>
+<script src="loops/loop2.js"></script>
+<script src="loops/loopMenu.js"></script>
+<script src="loops/loopMenuOption.js"></script>
+<script src="loops/loopPause.js"></script>
+<script src="loops/loopSkins.js"></script>
+<script src="loops/loopControl.js"></script>
+<script src="loops/loop1.js"></script>
+<script src="loops/deathScreen.js"></script>
+<script src="loops/devLoop.js"></script>
+
+<script src="teclas/skins.js"></script>
+<script src="teclas/controles.js"></script>
+<script src="teclas/optionsMenu.js"></script>
+<script src="teclas/pause.js"></script>
+<script src="teclas/menu.js"></script>
+<script src="teclas/death.js"></script>
+<script src="teclas/devMenu.js"></script>
+<script>
+var canvas = document.createElement("canvas");
+var context = canvas.getContext("2d");
+document.body.appendChild(canvas);
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+var background = new Background();
+
+var stars = new Stars();
+
+let skinsScreen = [ xWing1 = new Image, xWing2 = new Image ,xWing3 = new Image ,xWing4 = new Image, xWing5 = new Image, xWing6 = new Image, xWing7 = new Image, xWing8 = new Image]
+let skinsImg =["imgs/xWing.png","imgs/xWingP2.png","imgs/xWingP3.png","imgs/xWingP4.png","imgs/xWingP5.png","imgs/xWingP6.png","imgs/xWingP7.png","imgs/xWingP8.png"]
+let skinColor = ["blue","#ff0000","#C5C3FA","#5742b8","#F61941","#B8FE23","#B96BD9","#B2F1EE"]
+let actorSkin1 = skinsImg[0]
+let actorColor1 = skinColor[0]
+let actorSkin2 = skinsImg[0]
+let actorColor2 = skinColor[0]
+
+var actores={actor: new Actor(actorSkin1,actorColor1,100,canvas.height/2),
+			actor2: new Actor(actorSkin2,actorColor2,100,canvas.height/3)}
+
+let explosion = new SpritesExp('imgs/explosion.png',55,54.5,0,70,9,1)
+
+
+var obstacles1 = new Obstacles(TopObstacle);
+var obstacles2 = new Obstacles(BottomObstacle);
+
+var powers = new Powers();
+
+var lasers = new Lasers();
+
+var hud = new HUD();
+
+var enemies = new Enemies();
+
+var backgroundMusic = new BackgroundMusic("audios/Star Wars_ Battle of The Heroes x Duel of The Fates _ Obi-Wan Kenobi Soundtrack.mp3");
+
+var backgroundMusicMenu = new BackgroundMusic("audios/Star Wars Jedi Theme.mp3")
+
+var sounds =
+{	actorJump0: new Sound(`audios/xWing_sound_0.mp3`),
+	actorJump1: new Sound(`audios/xWing_sound_1.mp3`),
+	// actorCollideObstacle: new Sound("audios/hurt.mp3"),
+	actorCollideSizePower: new Sound("audios/coin.mp3"),
+	actorCollideGhostPower: new Sound("audios/throw.wav"),
+	actorCollideLaserAmmoPower: new Sound("audios/gunload.mp3"),
+	actorFireLaser: new Sound('audios/laser.mp3'),
+	actorFireBlaster: new Sound('audios/blaster.mp3'),
+	// actorCollideEnemy: new Sound("audios/collision.mp3"),
+	laserCollideEnemy: new Sound("audios/warning.wav"),
+	actorDeath: new Sound("audios/explosion.mp3"),
+	backgroundDestro: new Sound("audios/dreadnought.mp3"),
+	enemyShoot: new Sound("audios/TIEshoot.mp3"),
+	optionSwap: new Sound("audios/computer-processing-sound-effects-short-click-select-01-122134.mp3"),
+	spaceExplosion: new Sound("audios/space_explosion.mp3")
+};
+
+let Menu = 0;
+let option = 0;
+let options = {keys1: {jump: " ", blaster:"1" ,laser: "2",heal: "3"},keys2: {jump: "Enter", blaster:"8" ,laser: "9",heal: "0"}, sound: 0, difficulty: 0, players: 1};
+let optionPause = 0
+let pauseOption = 0
+let aux = 0
+let skin = 0
+let lock = 1
+let control = 0
+let blocked = 0
+let death = 0
+let devOption = 0
+
+for(let i=0;i<skinsImg.length;i++){
+	skinsScreen[i].src = skinsImg[i]
+}
+
+
+
+var timer = setInterval(loopMenu, 1000/FPS);
+document.addEventListener("keyup", onKeyUp);
+var date = 0
+var godmodeIndex = 0
+var godmode = 'betitolindao'
+function onKeyPress(event)
+{	
+	// console.log(event.key);
+	// console.log(godmodeIndex);
+
+	
+	if(event.key == godmode.charAt(godmodeIndex) && (Date.now()-date) < 300){
+		date = Date.now();
+		godmodeIndex++;
+		if(godmodeIndex == godmode.length){
+			actores.actor.lifes = 1/0
+			actores.actor.ammo.blaster = 1/0
+			actores.actor.ammo.laser = 1/0
+			actores.actor.ammo.medkit = 1/0
+			actores.actor.health = 1/0
+			actores.actor2.lifes = 1/0
+			actores.actor2.ammo.blaster = 1/0
+			actores.actor2.ammo.laser = 1/0
+			actores.actor2.ammo.medkit = 1/0
+			actores.actor2.health = 1/0
+		}
+	}
+	else{
+		godmodeIndex = 0;
+	}
+
+	if(event.key == godmode.charAt(0) && godmodeIndex == 0)
+	{	date = Date.now();
+		godmodeIndex++;
+		console.log("0"+event.key +" "+ godmodeIndex)
+	}
+	
+
+
+	//a.charAt(a.indexOf('c')+1)
+
+	
+	// if(event.key == 'o' && (Date.now()-date) < 300){
+
+	// 	actores.actor.ammo.laser = 1/0
+	// 	actores.actor.ammo.blaster = 1/0
+	// 	actores.actor.life = 1/0
+	// 	actores.actor.health = 1/0
+	// }
+	
+	
+	
+	/*
+						actores.actor.ammo.laser = 1/0
+						actores.actor.ammo.blaster = 1/0
+						actores.actor.life = 1/0
+						actores.actor.health = 1/0
+	
+	*/
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	// if(event.key =='p'){
+	// 	actores.actor.lifes = 1/0
+	// 	actores.actor.ammo.blaster = 1/0
+	// 	actores.actor.ammo.laser = 1/0
+	// 	actores.actor.ammo.medkit = 1/0
+	// }
+
+	if (event.key == options.keys1.jump)
+	{	actores.actor.velocity = (100*(actores.actor.width/1000 -1))+67;;
+		(Math.random() < 0.1) ? (Math.random() < 0.5) ? sounds.actorJump0.play() : sounds.actorJump1.play():null
+	}
+	if (event.key == options.keys1.blaster){
+		actores.actor.fireTirin()
+	}
+	if (event.key == options.keys1.laser)
+	{	actores.actor.fire();
+	}
+	if(event.key == options.keys1.heal){
+		if(actores.actor.ammo.medkit > 0){
+			actores.actor.ammo.medkit--
+			actores.actor.health += 30	
+		}
+		if(actores.actor.health >= 100){
+			actores.actor.health = 100
+		}
+	}
+
+	//P2
+	
+	if (event.key == options.keys2.jump && options.players == 2){
+		actores.actor2.velocity = (100*(actores.actor2.width/1000 -1))+67;;
+		(Math.random() < 0.1) ? (Math.random() < 0.5) ? sounds.actorJump0.play() : sounds.actorJump1.play():null
+	}
+	if (event.key == options.keys2.blaster && options.players == 2){
+		actores.actor2.fireTirin();
+	}
+	if (event.key == options.keys2.laser && options.players == 2){
+		actores.actor2.fire();
+	}
+	if(event.key == options.keys2.heal && options.players == 2){
+		if(actores.actor2.ammo.medkit > 0){
+			actores.actor2.ammo.medkit--
+			actores.actor2.health += 30	
+		}
+		if(actores.actor2.health >= 100){
+			actores.actor2.health = 100
+		}
+	}
+}
+
+
+
+
+
+
+
+</script>
+</html>
+
